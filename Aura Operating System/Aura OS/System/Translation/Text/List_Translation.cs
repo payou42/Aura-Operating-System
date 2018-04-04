@@ -186,6 +186,7 @@ namespace Aura_OS.System.Translation
                     Console.WriteLine("Nom du système d'exploitation: Aura");
                     Console.WriteLine("Version du système:            " + Kernel.version);
                     Console.WriteLine("Révision du système:           " + Kernel.revision);
+                    Console.WriteLine("Nom de la version:             " + Kernel.version_name_code);
                     Console.WriteLine("Date et heure:                 " + Time.MonthString() + "/" + Time.DayString() + "/" + Time.YearString() + ", " + Time.TimeString(true, true, true));
                     if (Kernel.SystemExists)
                     {
@@ -208,6 +209,7 @@ namespace Aura_OS.System.Translation
                     Console.WriteLine("Operating system name:     Aura");
                     Console.WriteLine("Operating system version:  " + Kernel.version);
                     Console.WriteLine("Operating system revision: " + Kernel.revision);
+                    Console.WriteLine("Version name:              " + Kernel.version_name_code);
                     Console.WriteLine("Date and time:             " + Time.MonthString() + "/" + Time.DayString() + "/" + Time.YearString() + ", " + Time.TimeString(true, true, true));
                     if (Kernel.SystemExists)
                     {
@@ -230,6 +232,7 @@ namespace Aura_OS.System.Translation
                     Console.WriteLine("Naam besturingssysteem:    Aura");
                     Console.WriteLine("Versie besturingssysteem:  " + Kernel.version);
                     Console.WriteLine("Revisie besturingssysteem: " + Kernel.revision);
+                    Console.WriteLine("Naam versie:               " + Kernel.version_name_code);
                     Console.WriteLine("Datum en tijd:             " + Time.MonthString() + "/" + Time.DayString() + "/" + Time.YearString() + ", " + Time.TimeString(true, true, true));
                     if (Kernel.SystemExists)
                     {
