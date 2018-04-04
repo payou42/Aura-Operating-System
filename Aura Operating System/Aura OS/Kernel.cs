@@ -30,9 +30,9 @@ namespace Aura_OS
 
         Setup setup = new Setup();
         public static bool running;
-        public static string version = "0.4.4";
-        public static string revision = "280320180010";
-        public static string version_name_code = "Universe";
+        public static string version = "0.5.0";
+        public static string revision = "040420182228"; //day month year hour minutes 
+        public static string version_name_code = "Universe"; //to change for differents big versions like Windows (Threshold for ex)
         public static string current_directory = @"0:\";
         public static string langSelected = "en_US";
         public static string userLogged;
