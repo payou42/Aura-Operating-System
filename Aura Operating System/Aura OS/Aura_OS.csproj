@@ -9,6 +9,36 @@
     <PXE_IgnoreDebugStubAttribute>False</PXE_IgnoreDebugStubAttribute>
     <ISO_StackCorruptionDetectionLevel>MethodFooters</ISO_StackCorruptionDetectionLevel>
     <ISO_IgnoreDebugStubAttribute>False</ISO_IgnoreDebugStubAttribute>
+    <IntelEdison_StackCorruptionDetectionLevel>MethodFooters</IntelEdison_StackCorruptionDetectionLevel>
+    <IntelEdison_IgnoreDebugStubAttribute>False</IntelEdison_IgnoreDebugStubAttribute>
+    <HyperV_StackCorruptionDetectionEnabled>True</HyperV_StackCorruptionDetectionEnabled>
+    <HyperV_StackCorruptionDetectionLevel>MethodFooters</HyperV_StackCorruptionDetectionLevel>
+    <HyperV_Name>Aura_OSBoot</HyperV_Name>
+    <HyperV_Description>Use Hyper-V to deploy and debug.</HyperV_Description>
+    <HyperV_Deployment>ISO</HyperV_Deployment>
+    <HyperV_Launch>HyperV</HyperV_Launch>
+    <HyperV_DebugEnabled>False</HyperV_DebugEnabled>
+    <HyperV_DebugMode>Source</HyperV_DebugMode>
+    <HyperV_IgnoreDebugStubAttribute>False</HyperV_IgnoreDebugStubAttribute>
+    <HyperV_VisualStudioDebugPort>Pipe: CosmosSerial</HyperV_VisualStudioDebugPort>
+    <HyperV_PxeInterface>192.168.68.1</HyperV_PxeInterface>
+    <HyperV_VMwareEdition>Player</HyperV_VMwareEdition>
+    <HyperV_EnableGDB>False</HyperV_EnableGDB>
+    <HyperV_StartCosmosGDB>false</HyperV_StartCosmosGDB>
+    <USB_StackCorruptionDetectionEnabled>True</USB_StackCorruptionDetectionEnabled>
+    <USB_StackCorruptionDetectionLevel>MethodFooters</USB_StackCorruptionDetectionLevel>
+    <USB_Name>Aura_OSBoot</USB_Name>
+    <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
+    <USB_Deployment>USB</USB_Deployment>
+    <USB_Launch>None</USB_Launch>
+    <USB_DebugEnabled>False</USB_DebugEnabled>
+    <USB_DebugMode>Source</USB_DebugMode>
+    <USB_IgnoreDebugStubAttribute>False</USB_IgnoreDebugStubAttribute>
+    <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
+    <USB_PxeInterface>192.168.68.1</USB_PxeInterface>
+    <USB_VMwareEdition>Workstation</USB_VMwareEdition>
+    <USB_EnableGDB>False</USB_EnableGDB>
+    <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
   </PropertyGroup>
   <PropertyGroup>
     <BinFormat>Bin</BinFormat>
@@ -91,6 +121,9 @@
     <IntelEdison_OutputPath>bin\Debug\net462\</IntelEdison_OutputPath>
     <IntelEdison_EnableGDB>False</IntelEdison_EnableGDB>
     <IntelEdison_StartCosmosGDB>false</IntelEdison_StartCosmosGDB>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Cosmos.Build" Version="*" NoWarn="NU1604" />
