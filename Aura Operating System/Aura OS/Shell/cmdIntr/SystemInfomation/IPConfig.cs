@@ -33,7 +33,8 @@ namespace Aura_OS.Shell.cmdIntr.SystemInfomation
         public static void c_IPConfig()
         {
             L.Text.Display("NetworkInProgress");
-            L.Text.Display("MAC");            
+            L.Text.Display("MAC");
+            L.Text.Display("IP");
         }
     }
 }

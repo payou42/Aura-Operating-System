@@ -18,6 +18,7 @@ using Aura_OS.System.Utils;
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.System.ExtendedASCII;
+using Aura_OS.Core.Networking;
 
 #endregion
 
@@ -72,6 +73,8 @@ namespace Aura_OS
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.Write("Booting Aura...\n");
                 Console.ForegroundColor = ConsoleColor.White;
+
+                APIPA.SetIP();
 
                 #region Register Filesystem
                 Sys.FileSystem.VFS.VFSManager.RegisterVFS(vFS);

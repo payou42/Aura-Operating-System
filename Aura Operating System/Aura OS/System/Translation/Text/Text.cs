@@ -218,6 +218,9 @@ namespace Aura_OS.System.Translation
                         case "MAC":
                             Console.WriteLine("Addresse Physique (MAC): " + Core.Networking.AMDNetwork.PhysicalAddress());
                             break;
+                        case "IP":
+                            Console.WriteLine("Addresse IP (IPv4): " + Core.Networking.Netconfig.IP() + "");
+                            break;
                         case "notavalidscript":
                             Console.WriteLine("Ce fichier n'est pas un script valide.");
                             break;
@@ -440,7 +443,10 @@ namespace Aura_OS.System.Translation
                             Console.WriteLine();
                             break;
                         case "MAC":
-                            Console.WriteLine("MAC Address: " + Core.Networking.AMDNetwork.PhysicalAddress());
+                            Console.WriteLine("MAC Adress: " + Core.Networking.AMDNetwork.PhysicalAddress());
+                            break;
+                        case "IP":
+                            Console.WriteLine("IP Adress (IPv4): " + Core.Networking.Netconfig.IP() + "");
                             break;
                         case "notavalidscript":
                             Console.WriteLine("This file is not a valid script.");
@@ -665,6 +671,9 @@ namespace Aura_OS.System.Translation
                             break;
                         case "MAC":
                             Console.WriteLine("MAC Adres: " + Core.Networking.AMDNetwork.PhysicalAddress());
+                            break;
+                        case "IP":
+                            Console.WriteLine("IP-adres (IPv4): " + Core.Networking.Netconfig.IP() + "/16");
                             break;
                         case "notavalidscript":
                             Console.WriteLine("Dit bestand is geen geldig script.");
