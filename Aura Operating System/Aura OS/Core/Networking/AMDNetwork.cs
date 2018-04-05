@@ -29,6 +29,12 @@ namespace Aura_OS.Core.Networking
             }
         }
 
+        public static AMDPCNetII AMDNetworkDevice()
+        {
+            AMDPCNetII nic = new AMDPCNetII(device);
+            return nic;
+        }
+
         public static bool NetworkCardAvailable()
         {
             PCIDevice device;
