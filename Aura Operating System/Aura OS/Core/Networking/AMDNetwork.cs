@@ -42,10 +42,5 @@ namespace Aura_OS.Core.Networking
                 return false;
             }
         }
-
-        public static void SetConfigIP()
-        {
-
-        }
     }
 }
