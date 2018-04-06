@@ -37,6 +37,55 @@ namespace Aura_OS.Core.Networking
             return _gw;
         }
 
+        public static void Test()
+        {
+            Address address = new Address(192, 168, 1, 80);
+            Address subnet = new Address(255, 255, 255, 0);
+            Address zero = new Address(192, 168, 1, 254);
+
+            Config config = new Config(address, subnet, zero);
+
+            _ip = address.ToString();
+            _subnet = subnet.ToString();
+            _gw = zero.ToString();
+
+            NetworkStack.ConfigIP(AMDNetwork.AMDNetworkDevice(), config);
+            NetworkStack.Init();
+        }
+
+        public static void ARPTest()
+        {
+            AMDNetwork.AMDNetworkDevice().DataReceived = HandlePacket;
+        }
+
+        internal static void HandlePacket(byte[] packetData)
+        {
+            Console.Write("Received Packet Length=");
+            if (packetData == null)
+            {
+                Console.WriteLine("**NULL**");
+                return;
+            }
+            Console.WriteLine(packetData.Length);
+            //Sys.Console.WriteLine(BitConverter.ToString(packetData));
+
+            UInt16 etherType = (UInt16)((packetData[12] << 8) | packetData[13]);
+            switch (etherType)
+            {
+                case 0x0806:
+                    ARPHandler(packetData);
+                    break;
+                case 0x0800:
+                    ARPHandler(packetData);
+                    break;
+            }
+        }
+
+        internal static void ARPHandler(byte[] packetData)
+        {
+            Console.WriteLine("Received ARP Packet");
+        }
+
         //public static int CIDR()
         //{
         //    char spliter = '.';
@@ -52,7 +101,7 @@ namespace Aura_OS.Core.Networking
         //    string second_binary = Convert.ToString(second, 2);
         //    string third_binary = Convert.ToString(third, 2);
         //    string fourth_binary = Convert.ToString(fourth, 2);
-            
+
         //    //ex: 11111111111111110000000000000000
         //    string compilation = first_binary + second_binary + third_binary + fourth_binary;
 

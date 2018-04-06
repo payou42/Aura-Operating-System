@@ -74,7 +74,8 @@ namespace Aura_OS
                 Console.Write("Booting Aura...\n");
                 Console.ForegroundColor = ConsoleColor.White;
 
-                APIPA.SetIP();
+                Netconfig.Test();
+                Netconfig.ARPTest();
 
                 #region Register Filesystem
                 Sys.FileSystem.VFS.VFSManager.RegisterVFS(vFS);
