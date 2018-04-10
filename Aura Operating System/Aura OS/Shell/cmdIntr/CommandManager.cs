@@ -196,24 +196,29 @@ namespace Aura_OS.Shell.cmdIntr
             {
 
                 Console.WriteLine("Finding network devices...");
+
+                PCIDevice device = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETIII);
+                System.Networking.Drivers.AMD_AM79C973.amd_am79c973_init(device);
+                Cosmos.Core.INTs.SetIrqHandler(device.InterruptLine, System.Networking.Drivers.AMD_AM79C973.amd_am79c973_handler);
+
                 //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.FindAll();
 
-                Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII nic = new Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII(PCI.GetDevice(0x1022, 0x2000));
+                //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII nic = new Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII(PCI.GetDevice(0x1022, 0x2000));
 
-                Console.WriteLine(nic.MACAddress);
+                //Console.WriteLine(nic.MACAddress);
 
-                IPv4.Address myIP = new IPv4.Address(192, 168, 169, 1);
-                IPv4.Address mySubnet = new IPv4.Address(255, 255, 255, 0);
-                IPv4.Address myGateway = new IPv4.Address(192, 168, 1, 1);
-                IPv4.Config myConfig = new IPv4.Config(myIP, mySubnet, myGateway);
+                //IPv4.Address myIP = new IPv4.Address(192, 168, 169, 1);
+                //IPv4.Address mySubnet = new IPv4.Address(255, 255, 255, 0);
+                //IPv4.Address myGateway = new IPv4.Address(192, 168, 1, 1);
+                //IPv4.Config myConfig = new IPv4.Config(myIP, mySubnet, myGateway);
 
-                NetworkStack.ConfigIP(nic, myConfig);
-                nic.Enable();
+                //NetworkStack.ConfigIP(nic, myConfig);
+                //nic.Enable();
 
-                while (true)
-                {
-                    NetworkStack.Update();
-                }
+                //while (true)
+                //{
+                //    NetworkStack.Update();
+                //}
 
                 //PCIDevice device;
                 //device = PCI.GetDevice(0x1022, 0x2000);
