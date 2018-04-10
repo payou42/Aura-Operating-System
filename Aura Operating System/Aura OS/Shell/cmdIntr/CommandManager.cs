@@ -197,9 +197,18 @@ namespace Aura_OS.Shell.cmdIntr
 
                 Console.WriteLine("Finding network devices...");
 
-                PCIDevice device = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETIII);
-                System.Networking.Drivers.AMD_AM79C973.amd_am79c973_init(device);
-                Cosmos.Core.INTs.SetIrqHandler(device.InterruptLine, System.Networking.Drivers.AMD_AM79C973.amd_am79c973_handler);
+                PCIDevice device = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+
+                if (device != null)
+                {
+                    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_init(device);
+                    Console.WriteLine("AMD_AM79C973 Initialized!");
+                    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_activate();
+                    Console.WriteLine("AMD_AM79C973 Activated!");
+                    Cosmos.Core.INTs.SetIrqHandler(device.InterruptLine, System.Networking.Drivers.AMD_AM79C973.amd_am79c973_handler);
+                    Console.WriteLine("AMD_AM79C973 Interrupt Line: " + device.InterruptLine); 
+                    Console.WriteLine("Int handler activated!");
+                }
 
                 //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.FindAll();
 

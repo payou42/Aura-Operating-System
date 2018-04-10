@@ -69,12 +69,14 @@ namespace Aura_OS.System.Networking.Drivers
         public static initialization_block init_block;
 
         static buffer_desc* send_buffer_desc;
-        static byte[,] send_buffers = new byte[2 * 1024 + 15, 8];
+        //static byte[,] send_buffers = new byte[2 * 1024 + 15, 8];
+        static byte[] send_buffers = new byte[2 * 1024 + 15];
         static byte[] send_buffer_desc_memory = new byte[2048 + 15];
         static int current_send_buffer;
 
         public static buffer_desc* recv_buffer_desc;
-        static byte[,] recv_buffers = new byte[2 * 1024 + 15, 8];
+        //static byte[,] recv_buffers = new byte[2 * 1024 + 15, 8];
+        static byte[] recv_buffers = new byte[2 * 1024 + 15];
         static byte[] recv_buffer_desc_memory = new byte[2048 + 15];
         static int current_recv_buffer;
 
@@ -110,7 +112,6 @@ namespace Aura_OS.System.Networking.Drivers
         public static void amd_am79c973_handler(ref IRQContext aContext)
         {
 	        Console.WriteLine("Interrupt recieved from AMD am79c973 network card. Analysing ...");
-            Console.ReadKey();
             amd_am79c973_analyse_status();
         }
 
@@ -141,6 +142,8 @@ namespace Aura_OS.System.Networking.Drivers
             MAC4 = (ushort)(CDDI.inw(MAC_address_4_port) % 256);
             MAC5 = (ushort)(CDDI.inw(MAC_address_4_port) / 256);
 
+            Console.WriteLine("MAC Address: " + MAC0 + ":"+ MAC1 + ":" + MAC2 + ":" + MAC3 + ":" + MAC4 + ":" + MAC5);
+
             IP0 = (ushort)(CDDI.inw(IP_address_0_port) % 256);
             IP1 = (ushort)(CDDI.inw(IP_address_2_port) / 256);
 
@@ -154,12 +157,16 @@ namespace Aura_OS.System.Networking.Drivers
 	        IP = (ushort)((IP1 << 8)
 		        | IP0);
 
+            //32 Bits mod
             CDDI.outw(register_address_port, 20);
             CDDI.outw(bus_control_register_data_port, 0x102);
 
+
+            // STOP reset
             CDDI.outw(register_address_port, 0);
             CDDI.outw(register_data_port, 0x04);
 
+            // initBlock
             init_block.mode = 0x0000;
 
             init_block.reserved1 = 0;
@@ -190,7 +197,7 @@ namespace Aura_OS.System.Networking.Drivers
             for (i = 0; i < 8; i++)
             {
 
-                fixed (byte* test = &send_buffers[i, 0])
+                fixed (byte* test = &send_buffers[i])
                 {
                     send_buffer_desc[i].address = (uint)((((int)test) + 15) & ~0xF);
                 }
@@ -200,7 +207,7 @@ namespace Aura_OS.System.Networking.Drivers
                 send_buffer_desc[i].flags2 = 0;
                 send_buffer_desc[i].avail = 0;
 
-                fixed (byte* test = &recv_buffers[i, 0])
+                fixed (byte* test = &recv_buffers[i])
                 {
                     recv_buffer_desc[i].address = (uint)((((int)test) + 15) & ~0xF);
                 }
@@ -226,7 +233,7 @@ namespace Aura_OS.System.Networking.Drivers
             }
         }
 
-        static void amd_am79c973_activate()
+        public static void amd_am79c973_activate()
         {
             CDDI.outw(register_address_port, 0);
             CDDI.outw(register_data_port, 0x41);
