@@ -18,14 +18,14 @@ namespace Aura_OS.System
     {
         private string username;
         private string password;
-        private string lang;
         private string hostname;
-        private string[] Users;
 
         private string FinalUsername;
         private string FinalPassword;
         private string FinalLang;
         private string FinalHostname;
+
+        private bool noinstallnofs = false;
 
         /// <summary>
         /// Verify filesystem
@@ -35,20 +35,21 @@ namespace Aura_OS.System
         /// <returns>"false", if there is not a FS</returns>
         public string FileSystem()
         {
-            try
+            if (Kernel.ContainsVolumes())
             {
                 if (File.Exists(@"0:\System\settings.conf"))
                 {
                     return "true";
-                } else
+                }
+                else
                 {
                     return "continue";
                 }
             }
-            catch
+            else
             {
                 return "false";
-            }            
+            }         
         }
 
         /// <summary>
@@ -56,9 +57,23 @@ namespace Aura_OS.System
         /// </summary>
         public void InitSetup()
         {           
-
-                RunWithoutFS();
-            
+            if(FileSystem() == "false")
+            {
+                RunWithoutFS(false);
+            }
+            else if(FileSystem() == "true"){
+                Kernel.SystemExists = true;
+            }
+            else if(FileSystem() == "continue")
+            {
+                RegisterLanguage();
+                RegisterUser();
+                if (!noinstallnofs)
+                {
+                    RegisterHostname();
+                    Installation();
+                }
+            }           
         }
 
         /// <summary>
@@ -92,36 +107,44 @@ namespace Aura_OS.System
             username = text.Remove(middle, text.Length - middle);
             password = text.Remove(0, middle + 6);
 
-            string tryusername = "";
-
-            if (tryusername.StartsWith("user:" + username))
+            if (username == "root" || password == "root")
             {
-                Text.Menu("alreadyuser");
-                RegisterUser();
+                noinstallnofs = true;
+                RunWithoutFS(true);
             }
             else
             {
-                if ((username.Length >= 4) && (username.Length <= 20))
+                string tryusername = "";
+
+                if (tryusername.StartsWith("user:" + username))
                 {
-                    if ((password.Length >= 6) && (password.Length <= 40))
-                    {
-                        //good
-                        password = MD5.hash(password);
-                        FinalUsername = username;
-                        FinalPassword = password;
-                    }
-                    else
-                    {
-                        Text.Menu("error2");
-                        RegisterUser();
-                    }
+                    Text.Menu("alreadyuser");
+                    RegisterUser();
                 }
                 else
                 {
-                    Text.Menu("error3");
-                    RegisterUser();
+                    if ((username.Length >= 4) && (username.Length <= 20))
+                    {
+                        if ((password.Length >= 6) && (password.Length <= 40))
+                        {
+                            //good
+                            password = MD5.hash(password);
+                            FinalUsername = username;
+                            FinalPassword = password;
+                        }
+                        else
+                        {
+                            Text.Menu("error2");
+                            RegisterUser();
+                        }
+                    }
+                    else
+                    {
+                        Text.Menu("error3");
+                        RegisterUser();
+                    }
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -155,19 +178,16 @@ namespace Aura_OS.System
                 FinalLang = "fr_FR";
                 Keyboard.Init();
             }
+            else if ((language.Equals("nl_NL")) || language.Equals("nl-NL"))
+            {
+                Kernel.langSelected = "nl_NL";
+                FinalLang = "nl_NL";
+                Keyboard.Init();
+            }
             else
             {
                 RegisterLanguage();
             }
-        }
-
-        /// <summary>
-        /// Called to define default colors
-        /// </summary>
-        public void RegisterDefaults()
-        {
-            Settings.PutValue("foregroundcolor","7");
-            Settings.PutValue("backgroundcolor", "0");
         }
 
         /// <summary>
@@ -191,18 +211,27 @@ namespace Aura_OS.System
             }
             catch
             {
-                RunWithoutFS();
+                RunWithoutFS(false);
             }            
         }
 
         /// <summary>
         /// Method called to start Aura_OS without using filesystem and loggged to "root"
         /// </summary>
-        public void RunWithoutFS() //logged with root without using filesystem
+        public void RunWithoutFS(bool nofsroot) //logged with root without using filesystem
         {
+            if (!nofsroot)
+            {
+                RegisterLanguage();
+            }
             Kernel.SystemExists = false;
             Kernel.userLogged = "root";
             Kernel.Logged = true;
+            Console.Clear();
+            WelcomeMessage.Display();
+            Text.Display("logged", "root");
+            Text.Display("nofilesystem");
+            Console.WriteLine();
             Kernel.running = true;
         }
 
@@ -275,12 +304,19 @@ namespace Aura_OS.System
                 Settings.PutValue("language", "fr_FR");
                 Menu.DispInstallationDialog(60);
             }
+            else if ((FinalLang.Equals("nl_NL")) || FinalLang.Equals("nl-NL"))
+            {
+                Settings.PutValue("language", "nl_NL");
+                Menu.DispInstallationDialog(60);
+            }
 
             Settings.PutValue("hostname", FinalHostname);
 
-            Menu.DispInstallationDialog(80);
+            Menu.DispInstallationDialog(70);
 
-            RegisterDefaults();
+            Settings.PutValue("setuptime", Time.MonthString() + "/" + Time.DayString() + "/" + Time.YearString() + ", " + Time.TimeString(true, true, true));
+
+            Menu.DispInstallationDialog(80);
 
             Settings.PushValues();
             System.Users.Users.PushUsers();

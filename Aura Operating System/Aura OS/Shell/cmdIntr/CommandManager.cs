@@ -4,6 +4,9 @@
 * PROGRAMMER(S):    John Welsh <djlw78@gmail.com>
 */
 
+using Cosmos.HAL.PCInformation;
+using System;
+using System.Collections.Generic;
 using Cosmos.HAL;
 using Cosmos.System.Network;
 using System;
@@ -53,7 +56,7 @@ namespace Aura_OS.Shell.cmdIntr
             }
             else if (cmd.Equals("help"))
             {
-                System.Translation.Help._Help();
+                System.Translation.List_Translation._Help();
             }
 
             #endregion Console
@@ -66,11 +69,11 @@ namespace Aura_OS.Shell.cmdIntr
             }
             else if (cmd.Equals("cp"))
             {
-                FileSystem.CP.c_CP();
+                FileSystem.CP.c_CP_only();
             }
             else if (cmd.StartsWith("cp "))
             {
-                FileSystem.CP.c_CP();
+                FileSystem.CP.c_CP(cmd);
             }
             else if ((cmd.Equals("dir")) || (cmd.Equals("ls")))
             {
@@ -172,6 +175,23 @@ namespace Aura_OS.Shell.cmdIntr
                 Tests.Crash.c_Crash();
             }
 
+            else if (cmd.Equals("crashcpu"))
+            {
+                int value = 1;
+                value = value - 1;
+                int result = 1 / value; //Division by 0
+            }
+
+            else if (cmd.Equals("beep"))
+            {
+                Kernel.speaker.beep();
+            }
+
+            //else if (cmd.StartsWith("xml "))
+            //{
+            //    Util.xml.CmdXmlParser.c_CmdXmlParser(cmd, 0, 4);
+            //}
+          
             else if (cmd.Equals("net"))
             {
 
@@ -252,13 +272,34 @@ namespace Aura_OS.Shell.cmdIntr
 
             #region Util           
 
+            else if (cmd.StartsWith("export"))
+            {
+                Util.EnvVar.c_Export(cmd);
+            }
+
+            else if (cmd.Equals("lspci"))
+            {
+                Util.Lspci.c_Lspci();
+            }
+
             else
             {
-                Util.CmdNotFound.c_CmdNotFound();
+                if (cmd.Length <= 0)
+                {
+                    Console.WriteLine();
+                    return;
+                }
+                else
+                { 
+                    Util.CmdNotFound.c_CmdNotFound();
+                }                
             }
+
+            Console.WriteLine();
 
             #endregion Util
 
         }
+
     }
 }
