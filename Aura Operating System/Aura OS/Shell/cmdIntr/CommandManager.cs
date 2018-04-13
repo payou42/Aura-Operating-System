@@ -11,10 +11,11 @@ using Cosmos.HAL;
 using Cosmos.System.Network;
 using System;
 using IPv4 = Cosmos.System.Network.IPv4;
+using System.Text;
 
 namespace Aura_OS.Shell.cmdIntr
 {
-    class CommandManager
+    unsafe class CommandManager
     {
         //TO-DO: Do for all commands:
         //       Windows like command, Linux like command, Aura original command (optional for the last one)
@@ -199,16 +200,52 @@ namespace Aura_OS.Shell.cmdIntr
 
                 PCIDevice device = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
 
-                if (device != null)
-                {
+                //if (device != null)
+                //{
+                //
+                  //  Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII nic = new Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII(PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII));
+                    //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.EnableDevice();
+
+                    
+
+                    //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.HandleNetworkInterrupt();
+
                     System.Networking.Drivers.AMD_AM79C973.amd_am79c973_init(device);
                     Console.WriteLine("AMD_AM79C973 Initialized!");
                     System.Networking.Drivers.AMD_AM79C973.amd_am79c973_activate();
                     Console.WriteLine("AMD_AM79C973 Activated!");
+                    Console.WriteLine("AMD_AM79C973 Interrupt Line: " + device.InterruptLine);
+                    //while (true)
+                    //{
                     Cosmos.Core.INTs.SetIrqHandler(device.InterruptLine, System.Networking.Drivers.AMD_AM79C973.amd_am79c973_handler);
-                    Console.WriteLine("AMD_AM79C973 Interrupt Line: " + device.InterruptLine); 
-                    Console.WriteLine("Int handler activated!");
+
+                    //Console.WriteLine("Status first:");
+                System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
+
+
+                //Console.WriteLine("Send:");
+
+                string test = "Hello network";
+
+                fixed (char* p = test)
+                {
+                    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_send((uint*)p, 13);
+                    
                 }
+
+                while (true)
+                {
+                    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
+                }
+
+                Console.ReadKey();
+                    Console.WriteLine("Status second:");
+                System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
+                Console.ReadKey();
+                    //}
+
+                    //Console.WriteLine("Int handler activated!");
+                //}
 
                 //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.FindAll();
 

@@ -5,6 +5,7 @@
 */
 
 using IL2CPU.API.Attribs;
+using System;
 using static Cosmos.Core.INTs;
 
 namespace Aura_OS.Core
@@ -37,5 +38,14 @@ namespace Aura_OS.Core
 
             System.Crash.StopKernel(aName, aDescription, lastsknowaddress, ctxinterrupt);
         }
+
+        //IRQ 09 - (Added for AMD PCNet network card)
+        //public static IRQDelegate IRQ09;
+        //public static void HandleInterrupt_29(ref IRQContext aContext)
+        //{
+          //  Console.WriteLine("HandleInterrupt_29");
+            //Cosmos.Core.INTs.IRQ(0x29, ref aContext);
+            //Global.PIC.EoiSlave();
+        //}
     }
 }
