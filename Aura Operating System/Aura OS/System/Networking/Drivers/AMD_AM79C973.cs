@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Aura_OS.System.Networking;
 using Cosmos.HAL;
 using static Cosmos.Core.INTs;
@@ -167,9 +168,9 @@ namespace Aura_OS.System.Networking.Drivers
             //IP = ((IP1 << 8)
             //    | IP0);
 
-
-            //Reset the card to get into defined state
+            //Reset the card
             amd_am79c973_reset();
+            Thread.Sleep(10);
 
             //32 Bits mod
             CDDI.outw(register_address_port, 20);
@@ -244,7 +245,7 @@ namespace Aura_OS.System.Networking.Drivers
         public static void amd_am79c973_activate()
         {
             CDDI.outw(register_address_port, 0);
-            CDDI.outw(register_data_port, 0x41);
+            CDDI.outw(register_data_port, 0x0041); //Init card and enable interrupts, IRQ should arrive NOW
 
             CDDI.outw(register_address_port, 4);
             ushort status = CDDI.inw(register_data_port);
