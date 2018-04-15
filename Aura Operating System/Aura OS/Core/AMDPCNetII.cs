@@ -8,14 +8,13 @@ using IL2CPU.API.Attribs;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
 {
-
-    [Plug(Target = typeof(Cosmos.Core.INTs))]
+    [Plug(Target = typeof(AMDPCNetII))]
     public class AMDPCNetII : NetworkDevice
     {
-        protected PCIDevice pciCard;
-        public static AMDPCNetIIIOGroup io;
+        protected PCIDeviceNormal pciCard;
+        protected AMDPCNetIIIOGroup io;
         protected MACAddress mac;
-        public static bool mInitDone;
+        protected bool mInitDone;
 
         protected ManagedMemoryBlock mInitBlock;
         protected ManagedMemoryBlock mRxDescriptor;
@@ -23,34 +22,29 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         protected List<ManagedMemoryBlock> mRxBuffers;
         protected List<ManagedMemoryBlock> mTxBuffers;
         protected Queue<byte[]> mRecvBuffer;
-        public static  Queue<byte[]> mTransmitBuffer;
+        protected Queue<byte[]> mTransmitBuffer;
         private int mNextTXDesc;
 
-        static ushort register_data_port;
-        static ushort register_address_port;
-
-        static ushort bus_control_register_data_port;
-
-        public AMDPCNetII(PCIDevice device)
+        public AMDPCNetII(PCIDeviceNormal device)
             : base()
         {
+            if (device == null)
+            {
+                throw new ArgumentException("PCI Device is null. Unable to get AMD PCNet card");
+            }
 
             this.pciCard = device;
-            //this.pciCard.Claimed = true;
-            //this.pciCard.EnableDevice();
+            this.pciCard.Claimed = true;
+            this.pciCard.EnableDevice();
 
-            io = new AMDPCNetIIIOGroup((ushort)this.pciCard.BaseAddressBar[0].BaseAddress);
+            Console.WriteLine("PCNET 1");
+            Console.ReadKey();
 
-            //this.io.RegisterData.DWord = 0;
-            io.RegisterData.DWord &= 0xffff0000;
-            io.RegisterData.DWord |= 0x5;
+            this.io = new AMDPCNetIIIOGroup((ushort)this.pciCard.BaseAddressBar[0].BaseAddress());
+            this.io.RegisterData.DWord = 0;
 
-            register_data_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x10);
-            register_address_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x12);
-
-            bus_control_register_data_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x16);
-
-            EnableDevice();
+            Console.WriteLine("PCNET 2");
+            Console.ReadKey();
 
             // Get the EEPROM MAC Address and set it as the devices MAC
             byte[] eeprom_mac = new byte[6];
@@ -63,26 +57,25 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             eeprom_mac[4] = BinaryHelper.GetByteFrom32bit(result, 0);
             eeprom_mac[5] = BinaryHelper.GetByteFrom32bit(result, 8);
 
-            Aura_OS.System.Networking.CDDI.outw(register_address_port, 20);
-            Aura_OS.System.Networking.CDDI.outw(bus_control_register_data_port, 0x102);
-
-            Aura_OS.System.Networking.CDDI.outw(register_address_port, 0);
-            Aura_OS.System.Networking.CDDI.outw(register_data_port, 0x04);
-
             mac = new MACAddress(eeprom_mac);
+
+            Console.WriteLine("PCNET 3");
+            Console.ReadKey();
 
             mInitBlock = new ManagedMemoryBlock(28, 4);
             mRxDescriptor = new ManagedMemoryBlock(256, 16);
             mTxDescriptor = new ManagedMemoryBlock(256, 16);
 
             mInitBlock.Write32(0x00, (0x4 << 28) | (0x4 << 20));
-            mInitBlock.Write32(0x04,
-                (UInt32)(eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24)));
+            mInitBlock.Write32(0x04, (UInt32)(eeprom_mac[0] | (eeprom_mac[1] << 8) | (eeprom_mac[2] << 16) | (eeprom_mac[3] << 24)));
             mInitBlock.Write32(0x08, (UInt32)(eeprom_mac[4] | (eeprom_mac[5] << 8)));
             mInitBlock.Write32(0x0C, 0x0);
             mInitBlock.Write32(0x10, 0x0);
             mInitBlock.Write32(0x14, mRxDescriptor.Offset);
             mInitBlock.Write32(0x18, mTxDescriptor.Offset);
+
+            Console.WriteLine("PCNET 4");
+            Console.ReadKey();
 
             InitializationBlockAddress = mInitBlock.Offset;
             SoftwareStyleRegister = 0x03;
@@ -110,61 +103,47 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 mTxBuffers.Add(buffer);
             }
 
+            Console.WriteLine("PCNET 5");
+            Console.ReadKey();
+
             mNextTXDesc = 0;
 
             // Setup our Receive and Transmit Queues
             mTransmitBuffer = new Queue<byte[]>();
             mRecvBuffer = new Queue<byte[]>();
 
-            Console.WriteLine("[PCNETII Debug] Interrupt line: " + this.pciCard.InterruptLine);
+            Console.WriteLine("PCNET 6");
+            Console.ReadKey();
 
-            INTs.SetIrqHandler(this.pciCard.InterruptLine, HandleNetworkInterrupt); //it's calling HandleNetworkInterrupt() but it doesn't work
+            INTs.SetIrqHandler(device.InterruptLine, HandleNetworkInterrupt);
 
-
+            Console.WriteLine("PCNET 7");
+            Console.ReadKey();
         }
 
-        public static void EnableDevice()
-        {
-            Aura_OS.System.Networking.CDDI.outw(register_address_port, 0);
-            Aura_OS.System.Networking.CDDI.outw(register_data_port, 0x41);
-
-            Aura_OS.System.Networking.CDDI.outw(register_address_port, 4);
-            ushort status = Aura_OS.System.Networking.CDDI.inw(register_data_port);
-
-            Aura_OS.System.Networking.CDDI.outw(register_address_port, 4);
-            Aura_OS.System.Networking.CDDI.outw(register_data_port, (ushort)(status | 0xC00));
-
-            Aura_OS.System.Networking.CDDI.outw(register_address_port, 0);
-            Aura_OS.System.Networking.CDDI.outw(register_data_port, 0x42);
-        }
-
-        public static void HandleNetworkInterrupt(ref INTs.IRQContext aContext)
+        protected void HandleNetworkInterrupt(ref INTs.IRQContext aContext)
         {
             UInt32 cur_status = StatusRegister;
 
-            Console.WriteLine("[PCNETII Debug] AMD PCNet IRQ raised!"); //it's doesn't work because we don't have this fucking message
-
-            Console.WriteLine("[PCNETII Debug] Status: " + cur_status);
-
+            Console.WriteLine("AMD PCNet IRQ raised!");
             if ((cur_status & 0x100) != 0)
             {
                 mInitDone = true;
-                Console.WriteLine("Init done!");
             }
             if ((cur_status & 0x200) != 0)
             {
                 if (mTransmitBuffer.Count > 0)
                 {
                     byte[] data = mTransmitBuffer.Peek();
-                    //if (SendBytes(ref data) == true)
-                    //{
-                    //    mTransmitBuffer.Dequeue();
-                    //}
+                    if (SendBytes(ref data) == true)
+                    {
+                        mTransmitBuffer.Dequeue();
+                    }
                 }
             }
             if ((cur_status & 0x400) != 0)
             {
-                //ReadRawData();
+                ReadRawData();
             }
 
             StatusRegister = cur_status;
@@ -177,21 +156,19 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static void FindAll()
         {
             Console.WriteLine("Scanning for AMD PCNetII cards...");
-            //  PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
-            //  if (device != null)
-            // {
-            //      AMDPCNetII nic = new AMDPCNetII((PCIDevice) device);
-            //
-            //      Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" +
-            //                        device.function);
-            //      Console.WriteLine("NIC IRQ: " + device.InterruptLine);
-            //      Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
-            //  }
+            PCIDevice device = Cosmos.HAL.PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+            if (device != null)
+            {
+                AMDPCNetII nic = new AMDPCNetII((PCIDeviceNormal)device);
+
+                Console.WriteLine("Found AMD PCNetII NIC on PCI " + device.bus + ":" + device.slot + ":" + device.function);
+                Console.WriteLine("NIC IRQ: " + device.InterruptLine);
+                Console.WriteLine("NIC MAC Address: " + nic.MACAddress.ToString());
+            }
         }
 
         #region Register Access Properties
-
-        public static UInt32 StatusRegister
+        protected UInt32 StatusRegister
         {
             get
             {
@@ -204,7 +181,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 io.RegisterData.DWord = value;
             }
         }
-
         protected UInt32 InitializationBlockAddress
         {
             get
@@ -226,7 +202,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 io.RegisterData.DWord = (value >> 16);
             }
         }
-
         protected UInt32 SoftwareStyleRegister
         {
             get
@@ -240,11 +215,9 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 io.BusData.DWord = value;
             }
         }
-
         #endregion
 
         #region Network Device Implementation
-
         public override MACAddress MACAddress
         {
             get { return mac; }
@@ -262,7 +235,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             return true;
         }
 
-        [DebugStub(Off = true)]
+        //[CompilerPlugs.DebugStub(Off = true)]
         public override bool QueueBytes(byte[] buffer, int offset, int length)
         {
             byte[] data = new byte[length];
@@ -314,12 +287,10 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             return false;
         }
-
         #endregion
 
         #region Helper Functions
-
-        [DebugStub(Off = true)]
+        //[CompilerPlugs.DebugStub(Off = true)]
         protected bool SendBytes(ref byte[] aData)
         {
             int txd = mNextTXDesc++;
@@ -350,8 +321,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
             return false;
         }
-
-        [DebugStub(Off = true)]
+        //[CompilerPlugs.DebugStub(Off = true)]
         private void ReadRawData()
         {
             uint status;
@@ -384,7 +354,6 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 }
             }
         }
-
         #endregion
     }
 }

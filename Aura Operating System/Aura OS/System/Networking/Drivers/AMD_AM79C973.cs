@@ -130,18 +130,18 @@ namespace Aura_OS.System.Networking.Drivers
         {
             device = _device;
 
-            MAC_address_0_port = (ushort)(device.BaseAddressBar[0].BaseAddress);
-            MAC_address_2_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x02);
-            MAC_address_4_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x04);
+            MAC_address_0_port = (ushort)(device.BaseAddressBar[0].BaseAddress());
+            MAC_address_2_port = (ushort)(device.BaseAddressBar[0].BaseAddress() + 0x02);
+            MAC_address_4_port = (ushort)(device.BaseAddressBar[0].BaseAddress() + 0x04);
 
             //IP_address_0_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x08);
             //IP_address_2_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x10); // NOTE: I have no idea where to find the IP address
 
-            register_data_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x10);
-            register_address_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x12);
+            register_data_port = (ushort)(device.BaseAddressBar[0].BaseAddress() + 0x10);
+            register_address_port = (ushort)(device.BaseAddressBar[0].BaseAddress() + 0x12);
 
-            reset_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x14);
-            bus_control_register_data_port = (ushort)(device.BaseAddressBar[0].BaseAddress + 0x16);
+            reset_port = (ushort)(device.BaseAddressBar[0].BaseAddress() + 0x14);
+            bus_control_register_data_port = (ushort)(device.BaseAddressBar[0].BaseAddress() + 0x16);
 
             current_send_buffer = 0;
             current_recv_buffer = 0;
@@ -170,7 +170,11 @@ namespace Aura_OS.System.Networking.Drivers
 
             //Reset the card
             amd_am79c973_reset();
-            Thread.Sleep(10);
+
+            int timer = 0; // Don't judge me
+            while (timer <= 1000) {
+                timer = timer + 1;
+            }
 
             //32 Bits mod
             CDDI.outw(register_address_port, 20);
@@ -255,6 +259,9 @@ namespace Aura_OS.System.Networking.Drivers
 
             CDDI.outw(register_address_port, 0);
             CDDI.outw(register_data_port, 0x42);
+
+            CDDI.outw(register_address_port, 0);
+            CDDI.outw(register_data_port, 0x43);
 
         }
 

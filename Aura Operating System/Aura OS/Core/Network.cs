@@ -16,8 +16,8 @@ namespace Aura_OS.Core
         /// </summary>
         public static string PhysicalAddress()
         {
-            PCIDevice device;
-            device = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+            PCIDeviceNormal device;
+            device = (PCIDeviceNormal)PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
             if (NetworkCardAvailable())
             {
                 AMDPCNetII nic = new AMDPCNetII(device);

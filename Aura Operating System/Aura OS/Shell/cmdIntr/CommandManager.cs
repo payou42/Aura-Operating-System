@@ -12,6 +12,8 @@ using Cosmos.System.Network;
 using System;
 using IPv4 = Cosmos.System.Network.IPv4;
 using System.Text;
+using Cosmos.HAL.Drivers.PCI.Network;
+using Cosmos.System.Network.IPv4;
 
 namespace Aura_OS.Shell.cmdIntr
 {
@@ -198,56 +200,141 @@ namespace Aura_OS.Shell.cmdIntr
 
                 Console.WriteLine("Finding network devices...");
 
-                PCIDevice device = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+                PCIDevice xNicDev = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+                if (xNicDev == null)
+                {
+                    Console.WriteLine("PCIDevice not found!!");
+                    Console.ReadKey();
+                    return;
+                }
+
+                PCIDeviceNormal xNicDevNormal = (PCIDeviceNormal)xNicDev;
+                if (xNicDevNormal == null)
+                {
+                    Console.WriteLine("Unable to cast as PCIDeviceNormal!");
+                    Console.ReadKey();
+                    return;
+                }
+                Console.WriteLine("Found AMD PCNetII NIC on PCI " + xNicDev.bus + ":" + xNicDev.slot + ":" + xNicDev.function);
+                Console.WriteLine("NIC IRQ: " + xNicDev.InterruptLine);
+                
+                var xNic = new AMDPCNetII(xNicDevNormal);
+                Console.WriteLine("NIC MAC Address: " + xNic.MACAddress.ToString());
+                NetworkStack.Init();
+                xNic.Enable();
+
+                //Console.WriteLine("Finding PCI device");
+                //PCIDeviceNormal xNicDev = (PCIDeviceNormal)PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+                //if (xNicDev == null)
+                //{
+                //    Console.WriteLine("  Not found!!");
+                //    return;
+                //}
+
+                //var xNicDevNormal = xNicDev as PCIDeviceNormal;
+                //if (xNicDevNormal == null)
+                //{
+                //   Console.WriteLine("Unable to cast as PCIDeviceNormal!");
+                //    return;
+                //}
+                // var xNic = new Cosmos.HAL.Drivers.PCI.AMDPCNetII(xNicDev);
+                //NetworkStack.Init();
+                //xNic.Enable();
+
+                //foreach (NetworkDevice device in NetworkDevice.Devices)
+                //{
+                //    Console.WriteLine("Device: ");
+                //    Console.WriteLine(device.MACAddress);
+                //}
+                //etworkStack.ConfigIP(xNic, new Config(new Address(192, 168, 1, 70), new Address(255, 255, 255, 0)));
+
+                //var xClient = new UdpClient(4242);
+                //xClient.Connect(new Address(192, 168, 1, 12), 4242);
+                //xClient.Send(new byte[]
+                //             {
+                //             1,
+                //             2,
+                //            3,
+                //            4,
+                //            5,
+                //            6,
+                //            7,
+                //            8,
+                ///            9,
+                //            0xAA,
+                //            0xBB,
+                //           0xCC,
+                //            0xDD,
+                //             0xEE,
+                //           0xFF
+                //           });
+                //
+                // while (true)
+                /// {
+                //     NetworkStack.Update();
+
+                //    Console.WriteLine("Done");
+                //    Console.ReadLine();
+                //}
+
+
+
+                //PCIDevice device = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
 
                 //if (device != null)
                 //{
                 //
-                  //  Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII nic = new Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII(PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII));
-                    //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.EnableDevice();
+                //  Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII nic = new Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII(PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII));
+                //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.EnableDevice();
 
-                    
 
-                    //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.HandleNetworkInterrupt();
 
-                    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_init(device);
-                    Console.WriteLine("AMD_AM79C973 Initialized!");
-                    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_activate();
-                    Console.WriteLine("AMD_AM79C973 Activated!");
-                    Console.WriteLine("AMD_AM79C973 Interrupt Line: " + device.InterruptLine);
-                    //while (true)
-                    //{
-                    Cosmos.Core.INTs.SetIrqHandler(device.InterruptLine, System.Networking.Drivers.AMD_AM79C973.amd_am79c973_handler);
+                //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.HandleNetworkInterrupt();
+                //Console.WriteLine("AMD_AM79C973 Interrupt Line: " + device.InterruptLine);
 
-                    //Console.WriteLine("Status first:");
-                System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
+                //Console.WriteLine("IRQ Handler set!");
+
+                //System.Networking.Drivers.AMD_AM79C973.amd_am79c973_init(device);
+                //Console.WriteLine("AMD_AM79C973 Initialized!");
+
+                //System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
+
+                //System.Networking.Drivers.AMD_AM79C973.amd_am79c973_activate();
+                //Console.WriteLine("AMD_AM79C973 Activated!");
+
+                //while (true)
+                //{
+
+
+                //Console.WriteLine("Status first:");
+                //System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
 
 
                 //Console.WriteLine("Send:");
 
-                string test = "Hello network";
+                //string test = "Hello network";
 
-                fixed (char* p = test)
-                {
-                    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_send((uint*)p, 13);
-                    
-                }
+                //fixed (char* p = test)
+                //{
+                //    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_send((uint*)p, 13);
 
-                while (true)
-                {
-                    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
-                }
-
-                Console.ReadKey();
-                    Console.WriteLine("Status second:");
-                System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
-                Console.ReadKey();
-                    //}
-
-                    //Console.WriteLine("Int handler activated!");
                 //}
 
-                //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII.FindAll();
+                //while (true)
+                //{
+                //    System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
+                //}
+
+                //Console.ReadKey();
+                //  Console.WriteLine("Status second:");
+                //System.Networking.Drivers.AMD_AM79C973.amd_am79c973_analyse_status();
+                //Console.ReadKey();
+                //}
+
+                //Console.WriteLine("Int handler activated!");
+                //}
+
+
 
                 //Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII nic = new Cosmos.HAL.Drivers.PCI.Network.AMDPCNetII(PCI.GetDevice(0x1022, 0x2000));
 
