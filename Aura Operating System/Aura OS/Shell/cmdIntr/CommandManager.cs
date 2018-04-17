@@ -200,7 +200,7 @@ namespace Aura_OS.Shell.cmdIntr
 
                 Console.WriteLine("Finding network devices...");
 
-                PCIDevice xNicDev = PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
+                PCIDeviceNormal xNicDev = (PCIDeviceNormal)PCI.GetDevice(VendorID.AMD, DeviceID.PCNETII);
                 if (xNicDev == null)
                 {
                     Console.WriteLine("PCIDevice not found!!");
@@ -208,17 +208,17 @@ namespace Aura_OS.Shell.cmdIntr
                     return;
                 }
 
-                PCIDeviceNormal xNicDevNormal = (PCIDeviceNormal)xNicDev;
-                if (xNicDevNormal == null)
-                {
-                    Console.WriteLine("Unable to cast as PCIDeviceNormal!");
-                    Console.ReadKey();
-                    return;
-                }
+                //PCIDeviceNormal xNicDevNormal = xNicDev;
+                //if (xNicDevNormal == null)
+                //{
+                //    Console.WriteLine("Unable to cast as PCIDeviceNormal!");
+                //    Console.ReadKey();
+                //    return;
+                //}
                 Console.WriteLine("Found AMD PCNetII NIC on PCI " + xNicDev.bus + ":" + xNicDev.slot + ":" + xNicDev.function);
                 Console.WriteLine("NIC IRQ: " + xNicDev.InterruptLine);
                 
-                var xNic = new AMDPCNetII(xNicDevNormal);
+                var xNic = new AMDPCNetII(xNicDev);
                 Console.WriteLine("NIC MAC Address: " + xNic.MACAddress.ToString());
                 NetworkStack.Init();
                 xNic.Enable();
