@@ -10,12 +10,6 @@ namespace Aura_OS.System.Networking.Protocols
 
         private void MakingRequest(byte[] MACsrcAdress, bool ethernet = true)
         {
-            RequestList.Add(0xff); //Broadcasting
-            RequestList.Add(0xff); //Broadcasting
-            RequestList.Add(0xff); //Broadcasting
-            RequestList.Add(0xff); //Broadcasting
-            RequestList.Add(0xff); //Broadcasting
-            RequestList.Add(0xff); //Broadcasting
             for (int i = 0; i < 6; i++)
             {
                 RequestList.Add(MACsrcAdress[i]); //MAC Address Source
